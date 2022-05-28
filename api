@@ -358,21 +358,21 @@ add_external_repo() { # add an external apt repo and its gpg key
 
   # make pi-apps key storage dir if it doesn't exist
   if [ ! -d /tmp/pi-apps-apt-keys ]; then
-    mkdir -p /tmp/pi-apps-apt-keys || error "add-external-repo: failed to create pi-apps key storage dir."
+    mkdir -p /tmp/pi-apps-apt-keys || error "add_external_repo: failed to create pi-apps key storage dir."
   fi
 
   # check if .list file already exists
-  [ -f /etc/apt/sources.list.d/${reponame}.list ] && error "add-external-repo: /etc/apt/sources.list.d/${reponame}.list already exists."
+  [ -f /etc/apt/sources.list.d/${reponame}.list ] && error "add_external_repo: /etc/apt/sources.list.d/${reponame}.list already exists."
 
   # download gpg key from specified url
   rm -f /tmp/pi-apps-apt-keys/${reponame}-keyring.gpg
-  wget -q "$pubkeyurl" -O /tmp/pi-apps-apt-keys/${reponame}-keyring.gpg || error "add-external-repo: download from specified pubkeyurl failed." && rm -f /tmp/pi-apps-apt-keys/${reponame}-keyring.gpg
+  wget -q "$pubkeyurl" -O /tmp/pi-apps-apt-keys/${reponame}-keyring.gpg || error "add_external_repo: download from specified pubkeyurl failed." && rm -f /tmp/pi-apps-apt-keys/${reponame}-keyring.gpg
 
   # create .list file
-  echo "deb [signed-by=/tmp/pi-apps-apt-keys/$reponame-keyring.gpg] $repopath" | sudo tee /etc/apt/sources.list.d/${reponame}.list >/dev/null || error "add-external-repo: failed to create .list file"
+  echo "deb [signed-by=/tmp/pi-apps-apt-keys/$reponame-keyring.gpg] $repopath" | sudo tee /etc/apt/sources.list.d/${reponame}.list >/dev/null || error "add_external_repo: failed to create .list file"
 
   # test if the repo works
-  sudo apt-get update -qq || error "add-external-repo: apt-get update failed. something is wrong with apt on your system."
+  sudo apt-get update -qq || error "add_external_repo: apt-get update failed. something is wrong with apt on your system."
 }
 
 rm_external_repo() { # remove an external apt repo and its gpg key
