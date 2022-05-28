@@ -351,6 +351,38 @@ app_to_pkgname() { #given an app-name, convert it to a unique, valid package-nam
   echo "pi-apps-$(echo "$app" | md5sum | cut -c1-8 | awk '{print $1}')"
 }
 
+add_external_repo() { # add an external apt repo and its gpg key
+  repopath="$1"
+  reponame="$2"
+  pubkeyurl="$3"
+
+  # make pi-apps key storage dir if it doesn't exist
+  if [ ! -d /tmp/pi-apps-apt-keys ]; then
+    mkdir -p /tmp/pi-apps-apt-keys || error "add-external-repo: failed to create pi-apps key storage dir."
+  fi
+
+  # check if .list file already exists
+  [ -f /etc/apt/sources.list.d/${reponame}.list ] && error "add-external-repo: /etc/apt/sources.list.d/${reponame}.list already exists."
+
+  # download gpg key from specified url
+  rm -f /tmp/pi-apps-apt-keys/${reponame}-keyring.gpg
+  wget -q "$pubkeyurl" -O /tmp/pi-apps-apt-keys/${reponame}-keyring.gpg || error "add-external-repo: download from specified pubkeyurl failed." && rm -f /tmp/pi-apps-apt-keys/${reponame}-keyring.gpg
+
+  # create .list file
+  echo "deb [signed-by=/tmp/pi-apps-apt-keys/$reponame-keyring.gpg] $repopath" | sudo tee /etc/apt/sources.list.d/${reponame}.list >/dev/null || error "add-external-repo: failed to create .list file"
+
+  # test if the repo works
+  sudo apt-get update -qq || error "add-external-repo: apt-get update failed. something is wrong with apt on your system."
+}
+
+rm_external_repo() { # remove an external apt repo and its gpg key
+  reponame="$1"
+
+  rm -f /tmp/pi-apps-apt-keys/${reponame}-keyring.gpg || error "rm_external_repo: removal of ${reponame}-keyring.gpg failed"
+
+  sudo rm -f /etc/apt/sources.list.d/${reponame}.list || error "rm_external_repo: removal of ${reponame}.list failed"
+}
+
 install_packages() { #Make some packages dependencies of the $app app. Package-names, regex, filenames, and urls are supported.
   
   #convert input array to newline-separated string
