@@ -383,7 +383,7 @@ add_external_repo() { # add an external apt repo and its gpg key
   fi
 
   # create .list file
-  echo "deb [signed-by=/usr/share/keyrings/$reponame-keyring.gpg] $repopath" | sudo tee /etc/apt/sources.list.d/${reponame}.list >/dev/null
+  echo "deb $repopath" | sudo tee /etc/apt/sources.list.d/${reponame}.list >/dev/null
 
   if [ $? != 0 ];then
     sudo rm -f /etc/apt/sources.list.d/${reponame}.list
