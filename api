@@ -378,9 +378,6 @@ add_external_repo() { # add an external apt repo and its gpg key
 
   # create .list file
   echo "deb [signed-by=/opt/pi-apps-apt-keys/$reponame-keyring.gpg] $repopath" | sudo tee /etc/apt/sources.list.d/${reponame}.list >/dev/null || error "add_external_repo: failed to create .list file"
-
-  # test if the repo works
-  sudo apt-get update -qq || error "add_external_repo: apt-get update failed. something is wrong with apt on your system."
 }
 
 rm_external_repo() { # remove an external apt repo and its gpg key
