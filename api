@@ -374,10 +374,22 @@ add_external_repo() { # add an external apt repo and its gpg key
 
   # download gpg key from specified url
   rm -f /usr/share/keyrings/${reponame}-keyring.gpg
-  curl -fsSL "$pubkeyurl" | sudo gpg --dearmor -o /usr/share/keyrings${reponame}-keyring.gpg || error "add_external_repo: download from specified pubkeyurl failed."
+  curl -fsSL "$pubkeyurl" | sudo gpg --dearmor -o /usr/share/keyrings${reponame}-keyring.gpg
+
+  if [ $? != 0 ];then
+    sudo rm -f /etc/apt/sources.list.d/${reponame}.list
+    sudo rm -f /usr/share/keyrings/${reponame}-keyring.gpg
+    error "add_external_repo: download from specified pubkeyurl failed."
+  fi
 
   # create .list file
-  echo "deb [signed-by=/usr/share/keyrings/$reponame-keyring.gpg] $repopath" | sudo tee /etc/apt/sources.list.d/${reponame}.list >/dev/null || error "add_external_repo: failed to create .list file"
+  echo "deb [signed-by=/usr/share/keyrings/$reponame-keyring.gpg] $repopath" | sudo tee /etc/apt/sources.list.d/${reponame}.list >/dev/null
+
+  if [ $? != 0 ];then
+    sudo rm -f /etc/apt/sources.list.d/${reponame}.list
+    sudo rm -f /usr/share/keyrings/${reponame}-keyring.gpg
+    error "add_external_repo: failed to create .list file"
+  fi
 }
 
 rm_external_repo() { # remove an external apt repo and its gpg key
