@@ -360,7 +360,10 @@ add_external_repo() { # add an external apt repo and its gpg key
   [ -z "$repopath" ] && error "add_external_packages: repopath not set"
   [ -z "$reponame" ] && error "add_external_packages: reponame not set"
   [ -z "$pubkeyurl" ] && error "add_external_packages: pubkeyurl not set"
-  
+
+  # check if links are valid
+  wget -q --spider "$pubkeyurl" || error "add_external_packages: pubkeyurl isn't a valid link"
+
   # make pi-apps key storage dir if it doesn't exist
   if [ ! -d /opt/pi-apps-apt-keys ]; then
     mkdir -p /opt/pi-apps-apt-keys || error "add_external_repo: failed to create pi-apps key storage dir."
