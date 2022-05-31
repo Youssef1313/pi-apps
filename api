@@ -366,7 +366,7 @@ add_external_repo() { # add an external apt repo and its gpg key
 
   # make pi-apps key storage dir if it doesn't exist
   if [ ! -d /usr/share/keyrings ]; then
-    mkdir -p /usr/share/keyrings || error "add_external_repo: failed to create pi-apps key storage dir."
+    sudo mkdir -p /usr/share/keyrings || error "add_external_repo: failed to create pi-apps key storage dir."
   fi
 
   # check if .list file already exists
