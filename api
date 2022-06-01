@@ -238,7 +238,6 @@ remove_repofile_if_unused() { #Given a sources.list.d file, delete it if nothing
     status "Removing the $(basename "$file" | sed 's/.list$//g') repo as it is not being used"
     sudo rm -f "$file"
   fi
-  
 }
 
 #apt functions
@@ -392,12 +391,41 @@ add_external_repo() { # add an external apt repo and its gpg key
   fi
 }
 
-rm_external_repo() { # remove an external apt repo and its gpg key
+rm_external_repo() { # remove an external apt repo and its gpg key, if the repo is no longer in use. (force-remove the repo with force argument)
+  # part of this function is modified from the`remove_repofile_if_unused` function.
+
   reponame="$1"
+  force="$2"
 
-  rm -f /usr/share/keyrings/${reponame}-keyring.gpg || error "rm_external_repo: removal of ${reponame}-keyring.gpg failed"
+  [ -z "$reponame" ] && error "rm_external_repo: reponame not provided"
 
-  sudo rm -f /etc/apt/sources.list.d/${reponame}.list || error "rm_external_repo: removal of ${reponame}.list failed"
+  # exit gracefully if .list file does not exist
+  [ -f "/etc/apt/sources.list.d/$reponame.list" ] || exit 0
+  
+  if [ "$force" == force ]; then
+    rm -f /usr/share/keyrings/${reponame}-keyring.gpg || error "rm_external_repo: removal of ${reponame}-keyring.gpg failed"
+    sudo rm -f /etc/apt/sources.list.d/${reponame}.list || error "rm_external_repo: removal of ${reponame}.list failed"
+    exit 0
+  fi
+
+  # determine what repo-urls are in the file
+  local urls="$(cat "/etc/apt/sources.list.d/$reponame.list" | grep -v '^#' | tr ' ' '\n' | grep '://')"
+  
+  # there could be multiple urls in one file. Check each url and set the in_use variable to 1 if any packages are found
+  local IFS=$'\n'
+  local in_use=0
+  local url
+  for url in $urls ; do
+    if anything_installed_from_repo "$url" >/dev/null; then
+      in_use=1
+      break
+    fi
+  done
+
+  if [ "$in_use" == 0 ]; then
+    status "Removing the $(basename "/etc/apt/sources.list.d/$reponame.list" | sed 's/.list$//g') repo as it is not being used"
+    sudo rm -f "/etc/apt/sources.list.d/$reponame.list"
+  fi
 }
 
 install_packages() { #Make some packages dependencies of the $app app. Package-names, regex, filenames, and urls are supported.
