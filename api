@@ -377,7 +377,9 @@ add_external_repo() { # add an external apt repo and its gpg key
   [ -f /etc/apt/sources.list.d/${reponame}.list ] && error "add_external_repo: /etc/apt/sources.list.d/${reponame}.list already exists."
 
   # download gpg key from specified url
-  sudo rm -f /usr/share/keyrings/${reponame}-keyring.gpg
+  if [ -f /usr/share/keyrings/${reponame-keyring.gpg} ]; then
+    sudo rm -f /usr/share/keyrings/${reponame}-keyring.gpg
+  fi 
   curl -fsSL "$pubkeyurl" | sudo gpg --dearmor -o /usr/share/keyrings/${reponame}-keyring.gpg
 
   if [ $? != 0 ];then
