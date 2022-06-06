@@ -360,6 +360,11 @@ add_external_repo() { # add an external apt repo and its gpg key
   [ -z "$reponame" ] && error "add_external_packages: reponame not set"
   [ -z "$pubkeyurl" ] && error "add_external_packages: pubkeyurl not set"
 
+  # exit if reponame contains space, since apt doesn't accept .list files with spaces in filename or keyname.
+  if [[ $reponame = *" "* ]]; then
+    error "add_external_repo: provided reponame contains a space."
+  fi
+
   # check if links are valid
   wget -q --spider "$pubkeyurl" || error "add_external_packages: pubkeyurl isn't a valid link"
 
@@ -398,6 +403,11 @@ rm_external_repo() { # remove an external apt repo and its gpg key, if the repo 
   force="$2"
 
   [ -z "$reponame" ] && error "rm_external_repo: reponame not provided"
+
+  # exit if reponame contains space, since apt doesn't accept .list files with spaces in filename or keyname.
+  if [[ $reponame = *" "* ]]; then
+    error "rm_external_repo: provided reponame contains a space."
+  fi
 
   # exit gracefully if .list file does not exist
   [ -f "/etc/apt/sources.list.d/$reponame.list" ] || exit 0
