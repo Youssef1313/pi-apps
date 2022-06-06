@@ -433,7 +433,7 @@ rm_external_repo() { # remove an external apt repo and its gpg key, if the repo 
   done
 
   if [ "$in_use" == 0 ]; then
-    status "Removing the $(basename "/etc/apt/sources.list.d/$reponame.list" | sed 's/.list$//g') repo as it is not being used"
+    status "Removing the $reponame repo as it is not being used"
     sudo rm -f "/etc/apt/sources.list.d/$reponame.list"
   fi
 }
