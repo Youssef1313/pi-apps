@@ -308,6 +308,15 @@ This is a special folder (`/tmp/pi-apps-local-packages`) used by the `install_pa
 - `app_to_pkgname` - Convert an app-name to an `apt`-compatible package name.
   - This function generates the name to use for creating dummy apt packages. The naming scheme is: `pi-apps-XXXXXXXX` (each `X` can be any lowercase letter or number)
   - View which dummy packages are installed now by running `apt search pi-apps-` in a terminal.
+- `add_external_repo` - adds external APT repositories and their public key file.
+  - Requires three inputs:
+    - first input: an external repo path (such as `https://ryanfortner.github.io/box64-debs/debian ./`)
+    - second input: a repo name (such as `box64`)
+      - The repo name can *not* contain spaces.
+    - third input: a url to the repo's gpg pubkey (such as `https://ryanfortner.github.io/box64-debs/KEY.gpg`)
+- `rm_external_repo` - removes external APT repositories and their public key file.
+  - Requires a repo name (such as `box64`, again, this cannot contain spaces).
+  - By default, the provided repo will only be removed if there are no packages installed from it. To bypass this, use `force` as your second input.
 - `install_packages` - Used by apps to install packages.
   - Some background information first:  
     - Goal: Pi-Apps is designed for people who install an app, try it out, then later uninstall it. You should not have to think twice before installing an app. Users should have confidence that **uninstalling the app will undo all changes and restore all disk-space.**
