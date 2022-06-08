@@ -374,7 +374,9 @@ add_external_repo() { # add an external apt repo and its gpg key
   fi
 
   # check if .list file already exists
-  [ -f /etc/apt/sources.list.d/${reponame}.list ] && error "add_external_repo: /etc/apt/sources.list.d/${reponame}.list already exists."
+  if [ -f /etc/apt/sources.list.d/${reponame}.list ]; then
+    sudo rm -f /etc/apt/sources.list.d/${reponame}.list || error "add_external_repo: failed to remove conflicting .list file."
+  fi
 
   # download gpg key from specified url
   if [ -f /usr/share/keyrings/${reponame-keyring.gpg} ]; then
