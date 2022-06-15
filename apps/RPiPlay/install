@@ -26,9 +26,9 @@ elif [ "$yn" = "Analog" ]; then
 else
     echo "RPiPlay starting with automatic audio output selection."
     $DIRECTORY/etc/terminal-run "rpiplay -b auto" RPiPlay
-fi" > startrpiplay
+fi" > startrpiplay || error "Failed to create start script."
 chmod +x startrpiplay
-sudo mv startrpiplay /usr/local/bin/
+sudo mv startrpiplay /usr/local/bin/ || error "Failed to move start script to /usr/local/bin."
 
 # Create desktop entry
 echo "[Desktop Entry]
